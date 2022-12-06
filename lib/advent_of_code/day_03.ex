@@ -11,9 +11,6 @@ defmodule AdventOfCode.Day03 do
   def part1(_args) do
     input = parse_input()
 
-    sack = List.first(input)
-    {comp1, comp2} = Enum.split(sack, trunc(length(sack) / 2))
-
     total =
       Enum.map(input, fn sack ->
         {comp1, comp2} = Enum.split(sack, trunc(length(sack) / 2))
