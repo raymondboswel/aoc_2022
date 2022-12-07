@@ -42,7 +42,6 @@ defmodule AdventOfCode.Day03 do
               Enum.any?(group3, fn item3 -> item3 == item end)
           end
         )
-        # |> Enum.dedup()
         |> List.first()
         |> letter_to_score()
       end)
