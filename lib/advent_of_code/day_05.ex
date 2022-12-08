@@ -65,18 +65,25 @@ defmodule AdventOfCode.Day05 do
 
     Enum.reduce(procedure, crates, fn move, acc ->
       [count, source, destination] = move
-      apply_move(acc, count, source - 1, destination - 1)
+      apply_move(acc, count, source - 1, destination - 1, false)
     end)
     |> Enum.map(fn stack -> List.last(stack) end)
     |> Enum.join()
   end
 
-  def apply_move(crates, count, source, destination) do
+  def apply_move(crates, count, source, destination, multiple) do
     source_stack = Enum.at(crates, source)
     destination_stack = Enum.at(crates, destination)
     dest_crates = source_stack |> Enum.reverse() |> Enum.take(count)
-    source_stack = source_stack |> Enum.reverse() |> Enum.drop(count) |> Enum.reverse()
 
+    dest_crates =
+      if multiple do
+        dest_crates |> Enum.reverse()
+      else
+        dest_crates
+      end
+
+    source_stack = source_stack |> Enum.reverse() |> Enum.drop(count) |> Enum.reverse()
     destination_stack = Enum.concat(destination_stack, dest_crates)
 
     crates
@@ -85,5 +92,13 @@ defmodule AdventOfCode.Day05 do
   end
 
   def part2(_args) do
+    {crates, procedure} = parse_input()
+
+    Enum.reduce(procedure, crates, fn move, acc ->
+      [count, source, destination] = move
+      apply_move(acc, count, source - 1, destination - 1, true)
+    end)
+    |> Enum.map(fn stack -> List.last(stack) end)
+    |> Enum.join()
   end
 end
