@@ -1,35 +1,5 @@
 defmodule AdventOfCode.Day07 do
-  def test_data do
-    """
-    $ cd /
-    $ ls
-    dir a
-    14848514 b.txt
-    8504156 c.dat
-    dir d
-    $ cd a
-    $ ls
-    dir e
-    29116 f
-    2557 g
-    62596 h.lst
-    $ cd e
-    $ ls
-    584 i
-    $ cd ..
-    $ cd ..
-    $ cd d
-    $ ls
-    4060174 j
-    8033020 d.log
-    5626152 d.ext
-    7214296 k
-    """
-  end
-
   def parse_input do
-    # input = test_data() |> String.split("\n")
-
     input =
       AdventOfCode.Input.get!(7)
       |> String.split("\n")
@@ -91,13 +61,13 @@ defmodule AdventOfCode.Day07 do
     end
   end
 
-  def get_directories(dir, valid_dirs \\ []) do
+  def get_directories(dir, filter_fn, valid_dirs \\ []) do
     dir_size = calc_size(dir, 0)
     child_directories = child_directories(dir)
 
     case child_directories do
       [] ->
-        if dir_size <= 100_000 do
+        if filter_fn.(dir_size) do
           [{dir.name, dir_size}]
         else
           []
@@ -105,7 +75,7 @@ defmodule AdventOfCode.Day07 do
 
       _ ->
         new_dir =
-          if dir_size <= 100_000 do
+          if filter_fn.(dir_size) do
             {dir.name, dir_size}
           else
             []
@@ -113,7 +83,7 @@ defmodule AdventOfCode.Day07 do
 
         new_valid_dirs =
           [new_dir | valid_dirs] ++
-            Enum.flat_map(child_directories, fn c -> get_directories(c, valid_dirs) end)
+            Enum.flat_map(child_directories, fn c -> get_directories(c, filter_fn, valid_dirs) end)
 
         new_valid_dirs
     end
@@ -121,10 +91,26 @@ defmodule AdventOfCode.Day07 do
 
   def part1(_args) do
     file_struct = parse_input()
-    dirs = get_directories(Map.get(file_struct, "/")) |> Enum.filter(fn x -> x != [] end)
+    less_than_100k = fn dir_size -> dir_size <= 100_000 end
+
+    dirs =
+      get_directories(Map.get(file_struct, "/"), less_than_100k)
+      |> Enum.filter(fn x -> x != [] end)
+
     dirs |> Enum.reduce(0, fn x, acc -> elem(x, 1) + acc end)
   end
 
   def part2(_args) do
+    file_struct = parse_input()
+    total_size = calc_size(Map.get(file_struct, "/"), 0)
+
+    filter_fn = fn _x -> true end
+    dirs = get_directories(Map.get(file_struct, "/"), filter_fn)
+
+    Enum.filter(dirs, fn el ->
+      available_space = 70_000_000 - (total_size - elem(el, 1))
+      available_space >= 30_000_000
+    end)
+    |> Enum.sort_by(&elem(&1, 1))
   end
 end
