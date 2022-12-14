@@ -121,24 +121,10 @@ defmodule AdventOfCode.Day07 do
 
   def part1(_args) do
     file_struct = parse_input()
-
     dirs = get_directories(Map.get(file_struct, "/")) |> Enum.filter(fn x -> x != [] end)
-    IO.inspect("Result dirs")
-
-    IO.inspect(dirs)
-    res = dirs |> Enum.reduce(0, fn x, acc -> elem(x, 1) + acc end)
-    IO.inspect(res)
+    dirs |> Enum.reduce(0, fn x, acc -> elem(x, 1) + acc end)
   end
 
   def part2(_args) do
   end
 end
-
-# map = %{
-#   "/" => %{
-#     "jmtrrp" => %{},
-#     "jssn" => %{},
-#     "lbrmb" => %{},
-#     "pcccp" => 11968
-#   }
-# }
